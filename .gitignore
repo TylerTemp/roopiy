@@ -85,3 +85,5 @@ fabric.properties
 *.pk
 *.py[c|o]
 __pycache__
+
+/temp
