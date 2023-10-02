@@ -1,0 +1,7 @@
+opencv-python
+onnx
+insightface
+onnxruntime-gpu
+numpy
+gfpgan
+docpie
