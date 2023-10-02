@@ -1,3 +1,4 @@
+import os.path
 import typing
 
 from gfpgan import GFPGANer
@@ -30,11 +31,22 @@ def load_face_analyser() -> FaceAnalysis:
 
 
 def load_face_enhancer() -> GFPGANer:
-    return GFPGANer(model_path='models/GFPGANv1.4.pth', upscale=1, device='cuda')
+    root_dir = os.path.normpath(os.path.abspath(os.path.join(__file__, '..', '..')))
+    cur_cwd = os.getcwd()
+    os.chdir(root_dir)
+    result = GFPGANer(model_path=os.path.join(root_dir, 'models/GFPGANv1.4.pth'), upscale=1, device='cuda')
+    os.chdir(cur_cwd)
+    # print(os.getcwd())
+    return result
 
 
 def load_face_swapper():
-    return insightface.model_zoo.get_model('models/inswapper_128.onnx', providers=['CUDAExecutionProvider'])
+    root_dir = os.path.normpath(os.path.abspath(os.path.join(__file__, '..', '..')))
+    return insightface.model_zoo.get_model(
+        os.path.join(root_dir, 'models/inswapper_128.onnx'),
+        root=root_dir,
+        download=False,
+        providers=['CUDAExecutionProvider'])
 
 
 def find_similar_face(face_1: Face, face_2: Face, expect_distance: float) -> bool:

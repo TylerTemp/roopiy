@@ -5,6 +5,7 @@ import pickle
 import shutil
 
 import cv2
+import tqdm
 from gfpgan import GFPGANer
 
 from roopiy.faces import enhance_face, load_face_swapper, load_face_enhancer, load_face_analyser
@@ -26,7 +27,7 @@ def swap(face_swapper, face_enhancer: GFPGANer, alias_to_target_face: dict[str, 
     _, _, tagged_faces_configs_raw = next(os.walk(target_tagged_faces_folder))
     tagged_faces_configs = [each for each in tagged_faces_configs_raw if each.endswith('.json')]
 
-    for each_json_file in tagged_faces_configs:
+    for each_json_file in tqdm.tqdm(tagged_faces_configs):
         with open(os.path.join(target_tagged_faces_folder, each_json_file), 'r', encoding='utf-8') as f:
             config: FrameFacesInfo = json.load(f)
 
@@ -36,6 +37,9 @@ def swap(face_swapper, face_enhancer: GFPGANer, alias_to_target_face: dict[str, 
 
         source_image_path = os.path.join(target_raw_frames_folder, image_file_name)
         replace_image_path = os.path.join(target_folder, image_file_name)
+
+        if os.path.exists(replace_image_path):
+            continue
 
         # if all(each['target_alias'] is None for each in faces_config):
         #     logger.debug('copy %s -> %s', image_file_name, replace_image_path)
@@ -55,7 +59,12 @@ def swap(face_swapper, face_enhancer: GFPGANer, alias_to_target_face: dict[str, 
                     with open(os.path.join(target_raw_faces_folder, image_file_name + '.pk'), 'rb') as f:
                         frame_faces = pickle.load(f)
                 # order: from -> to face
-                frame = face_swapper.get(frame, frame_faces[index], target_face, paste_back=True)
+                # print(image_file_name)
+                try:
+                    frame = face_swapper.get(frame, frame_faces[index], target_face, paste_back=True)
+                except BaseException:
+                    print(image_file_name)
+                    raise
                 enhance_face(face_enhancer, frame_faces[index], frame)
 
         if frame is None:

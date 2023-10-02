@@ -1,5 +1,6 @@
 import os
 import pickle
+import tqdm
 
 import cv2
 from insightface.app import FaceAnalysis
@@ -12,14 +13,14 @@ def split_raw_faces(face_analyser: FaceAnalysis, target_raw_frames_folder: str, 
 
     # target_raw_frames_folder = 'target_raw_frames'
     _, _, frame_images = next(os.walk(target_raw_frames_folder))
-    print(frame_images)
+    # print(frame_images)
 
     # target_raw_faces_folder = 'target_raw_faces'
     if not os.path.isdir(target_raw_faces_folder):
         os.makedirs(target_raw_faces_folder)
 
     # all raw faces
-    for frame_image_file in frame_images:
+    for frame_image_file in tqdm.tqdm(frame_images):
         frame = cv2.imread(os.path.join(target_raw_frames_folder, frame_image_file))
         faces = face_analyser.get(frame)
         faces_to_draw: list[FaceToDraw] = [FaceToDraw(

@@ -80,10 +80,13 @@ fabric.properties
 *.png
 *.jpg
 /target*
-/models
 /gfpgan
 *.pk
 *.py[c|o]
 __pycache__
 
 /temp
+
+/models/*
+!/models/.gitkeep
+*.egg-info

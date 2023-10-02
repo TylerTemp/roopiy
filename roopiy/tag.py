@@ -6,6 +6,7 @@ import typing
 from dataclasses import dataclass
 
 import cv2
+import tqdm
 
 from roopiy.faces import FaceToDraw, draw_faces, find_similar_face
 from roopiy.utils import Face, draw_text_center
@@ -29,6 +30,7 @@ class FrameFaceInfo(typing.TypedDict):
 
 class FrameFacesInfo(typing.TypedDict):
     auto: bool
+    lock_tagged: bool
     faces: list[FrameFaceInfo]
 
 
@@ -49,10 +51,11 @@ def group_faces(target_raw_frames_folder: str, target_raw_faces_folder: str, tar
 
     _, _, raw_faces_files = next(os.walk(target_raw_faces_folder))
     raw_faces_no_pk = [each for each in raw_faces_files if not each.endswith('.pk')]
+    raw_faces_no_pk.sort(key=lambda name: int(os.path.splitext(name)[0]))
 
     image_file_to_faces: dict[str, list[Face]] = {}
 
-    for raw_faces_image_file in raw_faces_no_pk:
+    for raw_faces_image_file in tqdm.tqdm(raw_faces_no_pk):
         raw_faces_pk_file = raw_faces_image_file + '.pk'
         logger.debug('checking %s', raw_faces_pk_file)
         with open(os.path.join(target_raw_faces_folder, raw_faces_pk_file), 'rb') as f:
@@ -60,7 +63,7 @@ def group_faces(target_raw_frames_folder: str, target_raw_faces_folder: str, tar
         image_file_to_faces[raw_faces_image_file] = faces
 
     # target faces info
-    target_alias_to_faces : dict[str, list[Face]] = {}
+    target_alias_to_faces: dict[str, list[Face]] = {}
     for each_target_basic_info in target_faces_groups:
         each_target_alias = each_target_basic_info.alias
         target_alias_to_faces[each_target_alias] = [
@@ -70,39 +73,47 @@ def group_faces(target_raw_frames_folder: str, target_raw_faces_folder: str, tar
         # each_target_face = image_file_to_faces[each_target_basic_info.raw_faces_image_file][each_target_basic_info.in]
 
     # check each frame
-    for image_file, faces in image_file_to_faces.items():
+    for image_file, faces in tqdm.tqdm(image_file_to_faces.items()):
         frame_file = os.path.join(target_raw_frames_folder, image_file)
 
         frame = cv2.imread(frame_file)
 
         target_image_path = os.path.join(target_tagged_faces_folder, image_file)
         target_image_config = target_image_path + '.json'
+        frame_faces_info_from_json = None
 
-        frame_faces_info: FrameFacesInfo = FrameFacesInfo(auto=True, faces=[])
+        frame_faces_info: FrameFacesInfo = FrameFacesInfo(auto=True, faces=[], lock_tagged=False)
         if os.path.isfile(target_image_config):
             with open(target_image_config, 'r', encoding='utf-8') as f:
                 frame_faces_info_from_json = json.load(f)
+
             if not frame_faces_info_from_json.setdefault('auto', False):
                 frame_faces_info = FrameFacesInfo(**frame_faces_info_from_json)
                 logger.debug('manu %s: %s', image_file, frame_faces_info)
-                for face_index, face in enumerate(faces):
-                    target_alias = frame_faces_info['faces'][face_index]['target_alias']
-                    if target_alias is None:
-                        frame_faces_info['faces'].append(FrameFaceInfo(target_alias=None))
-                        draw_faces(frame, [FaceToDraw(
-                            face=face,
-                            text=f'{face_index}',
-                            color=(0, 0, 255),
-                        )])
-                    else:
-                        frame_faces_info['faces'].append(FrameFaceInfo(target_alias=target_alias))
-                        draw_faces(frame, [FaceToDraw(
-                            face=face,
-                            text=f'{face_index}|{target_alias}',
-                            color=(255, 255, 255),
-                        )])
-                draw_text_center(frame, "LOCK", (0, 0, 255))
-                cv2.imwrite(target_image_path, frame)
+                if not frame_faces_info['lock_tagged']:
+                    for face_index, face in enumerate(faces):
+                        target_alias = frame_faces_info['faces'][face_index]['target_alias']
+                        if target_alias is None:
+                            frame_faces_info['faces'].append(FrameFaceInfo(target_alias=None))
+                            draw_faces(frame, [FaceToDraw(
+                                face=face,
+                                text=f'{face_index}',
+                                color=(0, 0, 255),
+                            )])
+                        else:
+                            frame_faces_info['faces'].append(FrameFaceInfo(target_alias=target_alias))
+                            draw_faces(frame, [FaceToDraw(
+                                face=face,
+                                text=f'{face_index}|{target_alias}',
+                                color=(255, 255, 255),
+                            )])
+                    draw_text_center(frame, "LOCK", (0, 0, 255))
+                    cv2.imwrite(target_image_path, frame)
+
+                    frame_faces_info['lock_tagged'] = True
+                    with open(target_image_config, 'w', encoding='utf-8') as f:
+                        json.dump(frame_faces_info, f, indent=2)
+
                 continue
 
         for face_index, face in enumerate(faces):
@@ -139,15 +150,17 @@ def to_look(image_or_json: str) -> None:
     if not config.get('auto', False):
         return
 
-    config['auto'] = False
-    image_path = os.path.splitext(image_or_json)[0]
-    frame = cv2.imread(image_path)
-    draw_text_center(frame, "LOCK", (0, 0, 255))
-    # print(image_path)
-    cv2.imwrite(image_path, frame)
+    if not config['lock_tagged']:
+        config['auto'] = False
+        config['lock_tagged'] = True
+        image_path = os.path.splitext(image_or_json)[0]
+        frame = cv2.imread(image_path)
+        draw_text_center(frame, "LOCK", (0, 0, 255))
+        # print(image_path)
+        cv2.imwrite(image_path, frame)
 
-    with open(image_or_json, 'w', encoding='utf-8') as f:
-        json.dump(config, f, indent=2)
+        with open(image_or_json, 'w', encoding='utf-8') as f:
+            json.dump(config, f, indent=2)
 
 
 def by_args(args: dict[str, any]) -> None:
@@ -155,7 +168,7 @@ def by_args(args: dict[str, any]) -> None:
     need_lock: bool = args['lock']
 
     if need_lock:
-        for image_or_json in args['<image_or_json>']:
+        for image_or_json in tqdm.tqdm(args['<image_or_json>']):
             to_look(image_or_json)
         return
 

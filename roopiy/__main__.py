@@ -1,14 +1,20 @@
 """
 Usage:
-    roopiy extract-video [video-options] <video_file> <frames_dir>
-    roopiy identify <frames_dir> <identify_dir>
-    roopiy tag lock <image_or_json>...
-    roopiy tag [tag-options] <frames_dir> <identify_dir> <tag_dir> [<group_face>]...
-    roopiy swap [--all] <frames_dir> <identify_dir> <tag_dir> <swap_dir> <swap_map>...
-    roopiy create-video <swap_dir> <video_file> <output_video_file>
+    roopiy [global-options] extract-video [video-options] <video_file> <frames_dir>
+    roopiy [global-options] identify <frames_dir> <identify_dir>
+    roopiy [global-options] tag lock <image_or_json>...
+    roopiy [global-options] tag [tag-options] <frames_dir> <identify_dir> <tag_dir> [<group_face>]...
+    roopiy [global-options] swap [--all] <frames_dir> <identify_dir> <tag_dir> <swap_dir> <swap_map>...
+    roopiy [global-options] create-video <swap_dir> <video_file> <output_video_file>
+
+Global Options:
+    --log=<level>       log level [default: INFO]
 
 Video Options:
     --fps=<number>      use fps. -1 for no limit [default: 30]
+    -s, --ss=<start_time>
+    -t, --to=<crop_length>
+    -c, --save-cut=<cut_video>
 
 Tag Options:
     -d, --distance=<number>     face distance for checking [default: 0.85]
@@ -35,16 +41,17 @@ from roopiy import tag
 
 def main():
     logging.basicConfig()
-    logging.getLogger().setLevel(logging.DEBUG)
+    logging.getLogger().setLevel(logging.WARNING)
 
     logger = logging.getLogger('roopiy')
-    logger.setLevel(logging.DEBUG)
 
     docpie.logger.setLevel(logging.WARNING)
     pie = docpie.Docpie(__doc__, namedoptions=True)
     # pie.preview()
     # sys.exit()
     pie.docpie()
+
+    logger.setLevel(pie['--log'])
 
     if pie['extract-video']:
         extract_video.by_args(pie)
