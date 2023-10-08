@@ -12,7 +12,7 @@ A video face swap tool using insightface
 
 1.  clone this project
 2.  `pip install -e .`.
-3.  change the `torch` and `torchvision` in `requirements.txt` as you need, `pip uninstall -y torch torchvision` then `pip install -r requirements.txt`
+3.  change the `torch` and `torchvision` in `requirements.txt` as you need, `pip uninstall -y onnxruntime` then `pip install -r requirements.txt`
 4.  Setup a model path, e.g. `temp` (note: use absolute path!)
 5.  download `inswapper_128.onnx` into your model path, from [huggingface](https://huggingface.co/ezioruan/inswapper_128.onnx) or [here](https://static.notexists.top/mirror/insightface/inswapper_128.onnx)
 6.  download [buffalo_l.zip](https://github.com/deepinsight/insightface/releases/download/v0.7/buffalo_l.zip) and unzip under `temp/models/buffalo_l`; you folder now looks like: `temp/models/buffalo_l/*.onnx`

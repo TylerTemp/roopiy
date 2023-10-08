@@ -1,9 +1,11 @@
 opencv-python
 onnx
 insightface
-onnxruntime-gpu
 numpy
 gfpgan
 docpie
+# gpu; otherwise just onnxruntime
+onnxruntime-gpu
+# change --index-url. see https://pytorch.org/ about how to install correct version for you
 torch --index-url https://download.pytorch.org/whl/cu121
 torchvision --index-url https://download.pytorch.org/whl/cu121
