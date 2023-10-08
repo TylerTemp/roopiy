@@ -1,7 +1,7 @@
 import json
 import logging
 import os
-import pickle
+import json
 import shutil
 
 import cv2
@@ -10,7 +10,7 @@ from gfpgan import GFPGANer
 
 from roopiy.faces import enhance_face, load_face_swapper, load_face_enhancer, load_face_analyser
 from roopiy.tag import FrameFacesInfo
-from roopiy.utils import Face, Frame
+from roopiy.utils import Face, Frame, dict_to_face
 
 
 def swap(face_swapper, face_enhancer: GFPGANer, alias_to_target_face: dict[str, Face], target_folder: str,
@@ -56,8 +56,8 @@ def swap(face_swapper, face_enhancer: GFPGANer, alias_to_target_face: dict[str, 
                     frame = cv2.imread(source_image_path)
                 if frame_faces is None:
                     # load pickle
-                    with open(os.path.join(target_raw_faces_folder, image_file_name + '.pk'), 'rb') as f:
-                        frame_faces = pickle.load(f)
+                    with open(os.path.join(target_raw_faces_folder, image_file_name + '.json'), 'rb') as f:
+                        frame_faces = [dict_to_face(each) for each in json.load(f)]
                 # order: from -> to face
                 # print(image_file_name)
                 try:

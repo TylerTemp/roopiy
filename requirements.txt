@@ -4,6 +4,7 @@ insightface
 numpy
 gfpgan
 docpie
+tqdm
 # gpu; otherwise just onnxruntime
 onnxruntime-gpu
 # change --index-url. see https://pytorch.org/ about how to install correct version for you

@@ -40,14 +40,13 @@ class ChDir(object):
     new_working_dir: str
 
     def __init__(self, new_working_dir: str):
-        self.cur_working_dir = os.getcwd()
         self.new_working_dir = new_working_dir
 
     def __enter__(self):
         self.cur_working_dir = os.getcwd()
         os.chdir(self.new_working_dir)
 
-    def __exit__(self):
+    def __exit__(self, exc_type, exc_value, exc_traceback):
         os.chdir(self.cur_working_dir)
 
 

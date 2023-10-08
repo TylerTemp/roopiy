@@ -28,6 +28,7 @@ setup(
         'numpy',
         'gfpgan',
         'docpie',
+        'tqdm'
         # 'torch',
         # 'torchvision',
     ],

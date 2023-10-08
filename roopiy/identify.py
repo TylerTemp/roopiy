@@ -1,11 +1,12 @@
 import os
-import pickle
+import json
 import tqdm
 
 import cv2
 from insightface.app import FaceAnalysis
 
 from roopiy.faces import FaceToDraw, draw_faces, load_face_analyser
+from roopiy.utils import FaceJSONEncoder
 
 
 def split_raw_faces(face_analyser: FaceAnalysis, target_raw_frames_folder: str, target_raw_faces_folder: str):
@@ -32,8 +33,10 @@ def split_raw_faces(face_analyser: FaceAnalysis, target_raw_frames_folder: str, 
         target_raw_faces_path = os.path.join(target_raw_faces_folder, frame_image_file)
         cv2.imwrite(target_raw_faces_path, drew_frame)
 
-        with open(target_raw_faces_path + '.pk', 'wb') as f:
-            pickle.dump(faces, f)
+        # with open(target_raw_faces_path + '.pk', 'wb') as f:
+        #     pickle.dump(faces, f)
+        with open(target_raw_faces_path + '.json', 'w', encoding='utf-8') as f:
+            json.dump(faces, f, indent=4, cls=FaceJSONEncoder)
 
 
 def by_args(args: dict[str, str]) -> None:

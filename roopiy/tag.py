@@ -1,7 +1,8 @@
 import json
 import logging
 import os
-import pickle
+# import pickle
+import json
 import typing
 from dataclasses import dataclass
 
@@ -9,7 +10,7 @@ import cv2
 import tqdm
 
 from roopiy.faces import FaceToDraw, draw_faces, find_similar_face
-from roopiy.utils import Face, draw_text_center
+from roopiy.utils import Face, draw_text_center, dict_to_face
 
 
 @dataclass
@@ -50,16 +51,16 @@ def group_faces(target_raw_frames_folder: str, target_raw_faces_folder: str, tar
         os.makedirs(target_tagged_faces_folder)
 
     _, _, raw_faces_files = next(os.walk(target_raw_faces_folder))
-    raw_faces_no_pk = [each for each in raw_faces_files if not each.endswith('.pk')]
+    raw_faces_no_pk = [each for each in raw_faces_files if not each.endswith('.json')]
     raw_faces_no_pk.sort(key=lambda name: int(os.path.splitext(name)[0]))
 
     image_file_to_faces: dict[str, list[Face]] = {}
 
     for raw_faces_image_file in tqdm.tqdm(raw_faces_no_pk):
-        raw_faces_pk_file = raw_faces_image_file + '.pk'
+        raw_faces_pk_file = raw_faces_image_file + '.json'
         logger.debug('checking %s', raw_faces_pk_file)
         with open(os.path.join(target_raw_faces_folder, raw_faces_pk_file), 'rb') as f:
-            faces: list[Face] = pickle.load(f)
+            faces: list[Face] = [dict_to_face(each) for each in json.load(f)]
         image_file_to_faces[raw_faces_image_file] = faces
 
     # target faces info
