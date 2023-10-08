@@ -75,7 +75,7 @@ def swap(face_swapper, face_enhancer: GFPGANer, alias_to_target_face: dict[str, 
             cv2.imwrite(replace_image_path, frame)
 
 
-def by_args(args: dict[str, str]) -> None:
+def by_args(args: dict[str, any]) -> None:
     # <frames_dir> <tag_dir> <swap_dir>
     frames_dir = args['<frames_dir>']
     tag_dir = args['<tag_dir>']
@@ -84,21 +84,24 @@ def by_args(args: dict[str, str]) -> None:
 
     swap_maps = args['<swap_map>']
 
-    face_swapper = load_face_swapper()
-    face_enhancer = load_face_enhancer()
+    model_root = args['--model-path'] or os.environ['ROOPIY_MODEL_PATH']
+
+    face_swapper = load_face_swapper(model_root)
+    face_enhancer = load_face_enhancer(model_root)
 
     alias_to_target_face: dict[str, Face] = {}
     face_analyser = None
     for swap_map in swap_maps:
 
         if face_analyser is None:
-            face_analyser = load_face_analyser()
+
+            face_analyser = load_face_analyser(model_root)
 
         alias, target_image_file = swap_map.split('/', 1)
 
         source_frame = cv2.imread(target_image_file)
         source_faces = face_analyser.get(source_frame)
-        print(len(source_faces))
+        # print(len(source_faces))
         source_face = source_faces[0]
         alias_to_target_face[alias] = source_face
 

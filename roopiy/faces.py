@@ -24,27 +24,48 @@ class FaceToDraw:
     color: tuple[int, int, int]
 
 
-def load_face_analyser() -> FaceAnalysis:
-    face_analyser = FaceAnalysis(name='buffalo_l', providers=['CUDAExecutionProvider'])
+def load_face_analyser(root: str) -> FaceAnalysis:
+    face_analyser = FaceAnalysis(
+        root=root,
+        name='buffalo_l',
+        providers=['CUDAExecutionProvider']
+    )
     face_analyser.prepare(ctx_id=0)
     return face_analyser
 
 
-def load_face_enhancer() -> GFPGANer:
-    root_dir = os.path.normpath(os.path.abspath(os.path.join(__file__, '..', '..')))
-    cur_cwd = os.getcwd()
-    os.chdir(root_dir)
-    result = GFPGANer(model_path=os.path.join(root_dir, 'models/GFPGANv1.4.pth'), upscale=1, device='cuda')
-    os.chdir(cur_cwd)
-    # print(os.getcwd())
+class ChDir(object):
+
+    cur_working_dir: str
+    new_working_dir: str
+
+    def __init__(self, new_working_dir: str):
+        self.cur_working_dir = os.getcwd()
+        self.new_working_dir = new_working_dir
+
+    def __enter__(self):
+        self.cur_working_dir = os.getcwd()
+        os.chdir(self.new_working_dir)
+
+    def __exit__(self):
+        os.chdir(self.cur_working_dir)
+
+
+def load_face_enhancer(root: str) -> GFPGANer:
+    # root_dir = os.path.normpath(os.path.abspath(os.path.join(__file__, '..', '..')))
+
+    with ChDir(root):
+        result = GFPGANer(model_path=os.path.join(root, 'GFPGANv1.4.pth'), upscale=1, device='cuda')
+
     return result
 
 
-def load_face_swapper():
-    root_dir = os.path.normpath(os.path.abspath(os.path.join(__file__, '..', '..')))
+def load_face_swapper(root):
+    # root_dir = os.path.normpath(os.path.abspath(os.path.join(__file__, '..', '..')))
     return insightface.model_zoo.get_model(
-        os.path.join(root_dir, 'models/inswapper_128.onnx'),
-        root=root_dir,
+        # os.path.join(root_dir, 'temp/inswapper_128.onnx'),
+        os.path.normpath(os.path.abspath(os.path.join(root, 'inswapper_128.onnx'))),
+        root=root,
         download=False,
         providers=['CUDAExecutionProvider'])
 

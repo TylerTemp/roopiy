@@ -39,6 +39,9 @@ def split_raw_faces(face_analyser: FaceAnalysis, target_raw_frames_folder: str, 
 def by_args(args: dict[str, str]) -> None:
     input_dir = args['<frames_dir>']
     output_dir = args['<identify_dir>']
-    face_analyser = load_face_analyser()
+
+    model_root = args['--model-path'] or os.environ['ROOPIY_MODEL_PATH']
+
+    face_analyser = load_face_analyser(model_root)
 
     split_raw_faces(face_analyser, input_dir, output_dir)

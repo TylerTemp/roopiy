@@ -9,6 +9,7 @@ Usage:
 
 Global Options:
     --log=<level>       log level [default: INFO]
+    --model-path=<model_path>    model path you downloaded
 
 Video Options:
     --fps=<number>      use fps. -1 for no limit [default: 30]
@@ -29,6 +30,9 @@ Swap Map:
 """
 
 import logging
+import warnings
+with warnings.catch_warnings():
+    import torchvision
 
 import docpie
 

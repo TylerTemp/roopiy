@@ -77,16 +77,22 @@ fabric.properties
 .idea/caches/build_file_checksums.ser
 
 .venv
-*.png
-*.jpg
-/target*
-/gfpgan
-*.pk
 *.py[c|o]
 __pycache__
 
-/temp
-
-/models/*
-!/models/.gitkeep
 *.egg-info
+
+/temp/*
+!/temp/.gitkeep
+
+!/temp/models/
+/temp/models/*
+!/temp/models/.gitkeep
+
+!/temp/gfpgan
+/temp/gfpgan/*
+!/temp/gfpgan/.gitkeep
+
+!/temp/gfpgan/weights
+/temp/gfpgan/weights/*
+!/temp/gfpgan/weights/.gitkeep

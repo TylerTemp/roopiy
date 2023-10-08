@@ -3,8 +3,8 @@ from setuptools import setup
 from roopiy.version import __version__
 
 setup(
-    name=__version__,
-    version='0.0.2',
+    name='roopiy',
+    version=__version__,
     author='TylerTemp',
     author_email='tylertempdev@gmail.com',
     description='controllable roop',
@@ -28,6 +28,8 @@ setup(
         'numpy',
         'gfpgan',
         'docpie',
+        'torch',
+        'torchvision',
     ],
     tests_require=[],
     cmdclass={},
