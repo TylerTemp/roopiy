@@ -19,7 +19,6 @@ A video face swap tool using insightface
 7.  download [GFPGANv1.4.pth](https://github.com/TencentARC/GFPGAN/releases/download/v1.3.0/GFPGANv1.4.pth) into your model path
 8.  download [detection_Resnet50_Final.pth](https://github.com/xinntao/facexlib/releases/download/v0.1.0/detection_Resnet50_Final.pth) into your model path `gfpgan/weights`
 9.  download [parsing_parsenet.pth](https://github.com/xinntao/facexlib/releases/download/v0.2.2/parsing_parsenet.pth) into your model path `gfpgan/weights`
-10. download [GFPGANv1.4.pth](https://github.com/TencentARC/GFPGAN/releases/download/v1.3.0/GFPGANv1.4.pth) into your model path
 
 ## Model Path ##
 
