@@ -24,7 +24,7 @@ setup(
         'opencv-python',
         'onnx',
         'insightface',
-        'onnxruntime',
+        # 'onnxruntime',
         'numpy',
         'gfpgan',
         'docpie',
