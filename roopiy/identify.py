@@ -1,12 +1,20 @@
 import os
 import json
+import typing
+
 import tqdm
 
 import cv2
 from insightface.app import FaceAnalysis
 
 from roopiy.faces import FaceToDraw, draw_faces, load_face_analyser
-from roopiy.utils import FaceJSONEncoder
+from roopiy.utils import FaceJSONEncoder, Face, Frame
+
+
+def identify_faces_in_image(face_analyser: FaceAnalysis, frame_image_path: str) -> (Frame, Face):
+    frame = cv2.imread(frame_image_path)
+    faces = face_analyser.get(frame)
+    return frame, faces
 
 
 def split_raw_faces(face_analyser: FaceAnalysis, target_raw_frames_folder: str, target_raw_faces_folder: str):
@@ -22,8 +30,9 @@ def split_raw_faces(face_analyser: FaceAnalysis, target_raw_frames_folder: str, 
 
     # all raw faces
     for frame_image_file in tqdm.tqdm(frame_images):
-        frame = cv2.imread(os.path.join(target_raw_frames_folder, frame_image_file))
-        faces = face_analyser.get(frame)
+        frame, faces = identify_faces_in_image(face_analyser, os.path.join(target_raw_frames_folder, frame_image_file))
+        # frame = cv2.imread(os.path.join(target_raw_frames_folder, frame_image_file))
+        # faces = face_analyser.get(frame)
         faces_to_draw: list[FaceToDraw] = [FaceToDraw(
             face=face,
             text=str(index),
