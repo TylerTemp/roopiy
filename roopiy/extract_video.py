@@ -60,7 +60,7 @@ def extract_frames(target_path: str, temp_directory_path: str, temp_frame_qualit
         assert save_cut
 
     if save_cut:
-        logger.info('save %s - %s to %s', ss, to, save_cut)
+        logger.info('save %s - %s to %s: %s', ss, to, save_cut, cut_command)
         subprocess.check_output(cut_command)
 
     logger.info('images %s', image_command)
