@@ -107,3 +107,33 @@ def by_args(args: dict[str, any]) -> None:
 
     swap(face_swapper, face_enhancer, alias_to_target_face, swap_dir,
          frames_dir, identify_dir, tag_dir, args['--all'])
+
+
+def image_by_args(args: dict[str, any]) -> None:
+    # <frames_dir> <tag_dir> <swap_dir>
+    source_image = args['<source_image>']
+    target_image_file = args['<target_face_image>']
+
+    model_root = args['--model-path'] or os.environ['ROOPIY_MODEL_PATH']
+
+    face_swapper = load_face_swapper(model_root)
+    face_enhancer = None if args['--no-enhance'] else load_face_enhancer(model_root)
+    face_analyser = load_face_analyser(model_root)
+
+    target_face_frame = cv2.imread(target_image_file)
+    target_faces = face_analyser.get(target_face_frame)
+    # print(len(source_faces))
+    target_face = target_faces[int(args['--target-index'])]
+    
+    source_frame = cv2.imread(source_image)
+    source_faces = face_analyser.get(source_frame)
+    source_face = source_faces[int(args['--source-index'])]
+
+    frame = face_swapper.get(source_frame, source_face, target_face, paste_back=True)
+
+    if face_enhancer:
+        enhance_face(face_enhancer, target_face, frame)
+
+    output_path = args['<output_image>'] or os.path.splitext(source_image)[0] + '_swapped' + os.path.splitext(source_image)[1]
+    print(f'fave to {output_path}')
+    cv2.imwrite(output_path, frame)

@@ -1,7 +1,7 @@
 # gpu; otherwise just onnxruntime
 onnxruntime-gpu
 # change --index-url. see https://pytorch.org/ about how to install correct version for you
---extra-index-urlhttps://download.pytorch.org/whl/cu121
+--extra-index-url=https://download.pytorch.org/whl/cu121
 torch
 torchvision
 

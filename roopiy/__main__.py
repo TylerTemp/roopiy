@@ -6,6 +6,7 @@ Usage:
     roopiy [global-options] tag [tag-options] <frames_dir> <identify_dir> <tag_dir> [<group_face>]...
     roopiy [global-options] swap [--all] <frames_dir> <identify_dir> <tag_dir> <swap_dir> <swap_map>...
     roopiy [global-options] create-video <swap_dir> <video_file> <output_video_file>
+    roopiy [global-options] image [image-options] <target_face_image> <source_image> [<output_image>]
 
 Global Options:
     --log=<level>       log level [default: INFO]
@@ -20,6 +21,11 @@ Video Options:
 Tag Options:
     -d, --distance=<number>     face distance for checking [default: 0.85]
 
+Image Options:
+    -s, --source-index=<number>     source image face index [default: 0]
+    -t, --target-index=<number>     target image face index [default: 0]
+    --no-enhance, --ne              disable face enhancement
+
 Group Face:
     format: `ALIAS/FILE:INDEX,FILE:INDEX,FILE:INDEX...`
     e.g. `thanos/000005.png:1`, means 000005.png seconds face (count from 0) is thanos
@@ -31,6 +37,7 @@ Swap Map:
 
 import logging
 import warnings
+import sys
 with warnings.catch_warnings():
     import torchvision
 
@@ -78,6 +85,12 @@ def main():
     if pie['create-video']:
         create_video.by_args(pie)
         return
+
+    if pie['image']:
+        swap.image_by_args(pie)
+        return
+
+    raise NotImplementedError(' '.join(sys.argv[1:]))
 
 
 if __name__ == '__main__':
