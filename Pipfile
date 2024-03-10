@@ -3,8 +3,23 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 name = "pypi"
 
+[[source]]
+url = "https://download.pytorch.org/whl/cu121"
+verify_ssl = true
+name = "downloadpytorch"
+
 [packages]
-roopiy = {editable = true, path = "."}
+onnxruntime-gpu = "==1.15.1"
+torch = "==2.0.0"
+torchvision = "==0.15.1"
+opencv-python = "==4.8.0.76"
+onnx = "==1.14.0"
+insightface = "==0.7.3"
+numpy = "==1.24.3"
+gfpgan = "*"
+docpie = "*"
+tqdm = "*"
+scikit-image = "==0.22.0"
 
 [dev-packages]
 

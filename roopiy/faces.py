@@ -54,7 +54,8 @@ def load_face_enhancer(root: str) -> GFPGANer:
     # root_dir = os.path.normpath(os.path.abspath(os.path.join(__file__, '..', '..')))
 
     with ChDir(root):
-        result = GFPGANer(model_path=os.path.join(root, 'GFPGANv1.4.pth'), upscale=1, device='cuda')
+        # print(os.path.abspath(os.path.join(root, 'GFPGANv1.4.pth')))
+        result = GFPGANer(model_path='GFPGANv1.4.pth', upscale=1, device='cuda')
 
     return result
 
