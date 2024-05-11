@@ -96,3 +96,5 @@ __pycache__
 !/temp/gfpgan/weights
 /temp/gfpgan/weights/*
 !/temp/gfpgan/weights/.gitkeep
+
+/build
